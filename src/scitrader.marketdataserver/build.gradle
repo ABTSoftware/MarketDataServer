@@ -15,8 +15,12 @@ dependencies {
 
     // Google Guice https://mvnrepository.com/artifact/com.google.inject/guice
     compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
-    
+
     // Log4J
     compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.1'
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.1'
+
+    // Dagger dependencies
+    implementation 'com.google.dagger:dagger:2.20'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.20'
 }
