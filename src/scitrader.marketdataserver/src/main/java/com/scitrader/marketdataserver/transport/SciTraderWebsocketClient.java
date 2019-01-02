@@ -3,6 +3,8 @@ package com.scitrader.marketdataserver.transport;
 import com.scitrader.marketdataserver.common.Guard;
 import com.scitrader.marketdataserver.common.MarketDataServerException;
 import com.sun.javaws.exceptions.InvalidArgumentException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -11,6 +13,8 @@ import java.net.URI;
 import java.util.function.Consumer;
 
 public class SciTraderWebsocketClient extends WebSocketClient {
+
+  private static final Logger Log = LogManager.getLogger(SciTraderWebsocketClient.class );
 
   private final Consumer<ServerHandshake> onOpen;
   private final Consumer<String> onMessage;
@@ -25,6 +29,7 @@ public class SciTraderWebsocketClient extends WebSocketClient {
 
     super(serverUri);
 
+    Guard.NotNull(serverUri, "Server URI cannot be null");
     Guard.NotNull(onOpen, "OnOpen consumer cannot be null");
     Guard.NotNull(onMessage, "OnMessage consumer cannot be null");
     Guard.NotNull(onClose, "OnClose consumer cannot be null");

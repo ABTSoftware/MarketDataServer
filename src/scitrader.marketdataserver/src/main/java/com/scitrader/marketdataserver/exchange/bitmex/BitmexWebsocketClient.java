@@ -17,24 +17,38 @@ public class BitmexWebsocketClient implements IBitmexWebsocketClient{
   Logger Log = LogManager.getLogger(BitmexWebsocketClient.class);
 
   private final String apiUrl = "wss://www.bitmex.com/realtime";
+  private final String[] instruments = new String[] { "XBTUSD" };
 
   public BitmexWebsocketClient() {
 
   }
 
   public void connect()  {
-    SciTraderWebsocketClient ws = new SciTraderWebsocketClient(getUri(),
-            a -> Log.info("Socket opened..."),
+
+    URI uri = getUri();
+    Log.info("Initializing SciTraderWebsocketClient with Uri = " + uri.toString());
+
+    SciTraderWebsocketClient ws = new SciTraderWebsocketClient(uri,
+            o -> Log.info("Opened websocket"),
             m -> Log.info("Message: " + m),
             (i,s,b) -> Log.info("Socket closed..."),
             ex -> Log.info("Socket error!"));
+
+    Log.info("Starting connection");
 
     ws.connect();
   }
 
   private URI getUri(){
     try{
-      return new URI(this.apiUrl);
+      StringBuilder sb  = new StringBuilder();
+      sb.append(apiUrl);
+      //sb.append("?subscribe=instrument");
+      sb.append("?subscribe=trade:XBTUSD,trade:ETHUSD");
+//      for(String inst : instruments){
+//        sb.append(",trade:").append(inst);
+//      }
+      return new URI(sb.toString());
     }
     catch(Exception ex){
       throw new MarketDataServerException(ex);
