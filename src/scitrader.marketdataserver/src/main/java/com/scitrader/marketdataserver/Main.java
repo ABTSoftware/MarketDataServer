@@ -13,7 +13,9 @@ public class Main {
 
     log.info("I am in your base, killing your doods");
 
-    MarketDataServerImpl server = new MarketDataServerImpl();
+    Injector injector = Guice.createInjector(new MarketDataServerModule());
+    MarketDataServer server = injector.getInstance(MarketDataServer.class);
+
     server.Run();
   }
 }
