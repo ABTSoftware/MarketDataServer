@@ -22,7 +22,12 @@ public class PriceBar {
   }
   
   public PriceBar(DateTime time, double open, double high, double low, double close, double volume){
-    
+    this.time = time;
+    this.open = open;
+    this.high = high;
+    this.low = low;
+    this.close = close;
+    this.volume = volume;
   }
 
   public DateTime getTime() {
