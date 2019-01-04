@@ -72,7 +72,7 @@ public class BitmexWebsocketClient implements IBitmexWebsocketClient{
         TicksMessage ticks = JsonIterator.deserialize(message, TicksMessage.class);
         for(Tick t : ticks.data){
           String symbol = t.getSymbol();
-          MongoCollection<Document> collection = mongoDatabase.getCollection(symbol);
+          MongoCollection<Document> collection = mongoDatabase.getCollection("BITMEX:" + symbol);
           Document doc = t.toBsonDocument();
           collection.insertOne(doc);
         }
