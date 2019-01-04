@@ -28,9 +28,9 @@ public class TimeTickAggregator extends TickAggregatorBase implements ITickAggre
     Guard.assertIsTrue(barType == PriceBarType.Time, "PriceBarType must be Time");
 
     // Get time interval
-    Period timeInterval;
+    Duration timeInterval;
     try{
-      timeInterval = Period.parse((String)arg);
+      timeInterval = Period.parse((String)arg).toStandardDuration();
     }
     catch(Exception ex){
       throw new MarketDataServerException("Cannot parse the object " + arg.toString() + " as an Interval");
@@ -54,16 +54,20 @@ public class TimeTickAggregator extends TickAggregatorBase implements ITickAggre
     double high = Double.MIN_VALUE;
     double low = Double.MAX_VALUE;
     double close = 0;
+    double volume = 0;
     boolean hasTicks = false;
     DateTime barStartTime = from;
+    DateTime barEndTime = barStartTime.withDurationAdded(timeInterval, 1);
 
     for(Document d : ticks)
     {
       Tick tick = Tick.fromBsonDocument(symbol, d);
-      if (tick.getTimeStampAsDate().isBefore( barStartTime.withPeriodAdded(timeInterval, 0)))
+
+      if (tick.getTimeStampAsDate().isBefore(barEndTime))
       {
         double price = tick.getPrice();
         close = price;
+        volume += Math.abs(tick.getSize());
 
         if (!hasTicks)
         {
@@ -82,12 +86,15 @@ public class TimeTickAggregator extends TickAggregatorBase implements ITickAggre
       {
         if (hasTicks)
         {
-          priceBars.add(new PriceBar());
+          priceBars.add(new PriceBar(barStartTime, open, high, low, close, volume));
 
           hasTicks = false;
         }
         else
-          barStartTime = barStartTime.withPeriodAdded(timeInterval, 0);
+        {
+          barStartTime = barStartTime.withDurationAdded(timeInterval, 1);
+          barEndTime = barEndTime.withDurationAdded(timeInterval, 1);
+        }
       }
     }
 

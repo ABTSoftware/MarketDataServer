@@ -20,12 +20,12 @@ public class DateUtil {
     return tickFormatter;
   }
 
-  public static DateTime RoundDown(DateTime value, Period nearest)
+  public static DateTime RoundDown(DateTime value, Duration nearest)
   {
     return new DateTime(RoundDown(value.getMillis(), nearest.getMillis()));
   }
 
-  public static DateTime RoundUp(DateTime value, Period nearest)
+  public static DateTime RoundUp(DateTime value, Duration nearest)
   {
     return new DateTime(RoundUp(value.getMillis(), nearest.getMillis()));
   }

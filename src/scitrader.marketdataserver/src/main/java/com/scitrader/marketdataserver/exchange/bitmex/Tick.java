@@ -137,8 +137,8 @@ public class Tick  {
   public static Tick fromBsonDocument(String symbol, Document document){
     Tick t = new Tick();
     t.setSymbol(symbol);
-    t.setSize((float)document.get("Size"));
-    t.setPrice((float)document.get("Price"));
+    t.setSize(((Double)document.get("Size")).floatValue());
+    t.setPrice(((Double)document.get("Price")).floatValue());
     t.setTimeStampAsDate(new DateTime((long)document.get("Time")));
     t.setSide(t.getSize() < 0 ? "Sell" : "Buy");
     return t;
