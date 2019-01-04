@@ -2,6 +2,7 @@ package com.scitrader.marketdataserver.datastore.aggregators;
 
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.model.Collation;
 import com.scitrader.marketdataserver.common.MarketDataServerException;
 import com.scitrader.marketdataserver.common.Model.PriceBar;
@@ -55,46 +56,49 @@ public class TimeTickAggregator extends TickAggregatorBase implements ITickAggre
     double low = Double.MAX_VALUE;
     double close = 0;
     double volume = 0;
-    boolean hasTicks = false;
+    long tickCount = 0;
     DateTime barStartTime = from;
     DateTime barEndTime = barStartTime.withDurationAdded(timeInterval, 1);
 
-    for(Document d : ticks)
+    MongoCursor<Document> itr = ticks.iterator();
+    while(itr.hasNext())
     {
-      Tick tick = Tick.fromBsonDocument(symbol, d);
+      Tick tick = Tick.fromBsonDocument(symbol, itr.next());
+      double price = tick.getPrice();
 
-      if (tick.getTimeStampAsDate().isBefore(barEndTime))
+      if (tick.getTimeStampAsDate().isBefore(barEndTime) && itr.hasNext())
       {
-        double price = tick.getPrice();
         close = price;
         volume += Math.abs(tick.getSize());
 
-        if (!hasTicks)
+        if (tickCount == 0)
         {
           high = price;
           low = price;
           open = price;
-          hasTicks = true;
         }
         else
         {
           high = Math.max(high, price);
           low = Math.min(price, low);
         }
+
+        tickCount++;
       }
       else
       {
-        if (hasTicks)
-        {
-          priceBars.add(new PriceBar(barStartTime, open, high, low, close, volume));
+        // Bar time exceeded, add price bar and setup for next tick
+        priceBars.add(new PriceBar(barStartTime, open, high, low, close, volume));
 
-          hasTicks = false;
-        }
-        else
-        {
-          barStartTime = barStartTime.withDurationAdded(timeInterval, 1);
-          barEndTime = barEndTime.withDurationAdded(timeInterval, 1);
-        }
+        tickCount = 1;
+        open = price;
+        high = price;
+        low = price;
+        close = price;
+        volume = Math.abs(tick.getSize());
+
+        barStartTime = barStartTime.withDurationAdded(timeInterval, 1);
+        barEndTime = barEndTime.withDurationAdded(timeInterval, 1);
       }
     }
 
