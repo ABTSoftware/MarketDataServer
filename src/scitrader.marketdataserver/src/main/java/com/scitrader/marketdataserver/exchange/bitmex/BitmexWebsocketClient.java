@@ -52,8 +52,13 @@ public class BitmexWebsocketClient implements IBitmexWebsocketClient{
       SubscribeMessage sub = JsonIterator.deserialize(message, SubscribeMessage.class);
       Log.info("Received Subscribe! " + sub.getRequest().getArgs());
     } else if (message.contains("table") && message.contains("trade")) {
-      TickMessage tick = JsonIterator.deserialize(message, TickMessage.class);
-      Log.info("Received data: " + message);
+      if (message.contains("partial")){
+        Log.info("Ignoring partial trade message: " + message);
+      }
+      else if (message.contains("insert")){
+        TicksMessage tick = JsonIterator.deserialize(message, TicksMessage.class);
+        Log.info("Received data: " + tick.data);
+      }
     }
     else {
       throw new MarketDataServerException("The message type has no associated deserializer. Message=" + message);
