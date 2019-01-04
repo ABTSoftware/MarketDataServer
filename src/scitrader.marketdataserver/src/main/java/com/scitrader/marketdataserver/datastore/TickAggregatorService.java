@@ -7,6 +7,7 @@ import com.mongodb.client.model.Filters;
 import com.scitrader.marketdataserver.common.MarketDataServerException;
 import com.scitrader.marketdataserver.common.Model.PriceBar;
 import com.scitrader.marketdataserver.common.Model.PriceBarType;
+import com.scitrader.marketdataserver.datastore.aggregators.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
@@ -46,7 +47,13 @@ public class TickAggregatorService implements ITickAggregatorService {
    */
 
   @Override
-  public List<PriceBar> getPriceBars(String exchangeCode, String marketDataIdentifier, DateTime from, DateTime to, PriceBarType barType){
+  public List<PriceBar> getPriceBars(
+          String exchangeCode,
+          String marketDataIdentifier,
+          DateTime from,
+          DateTime to,
+          PriceBarType barType,
+          Object barTypeArg){
 
     String fullInstrumentName = exchangeCode + ":" + marketDataIdentifier;
 
@@ -64,61 +71,19 @@ public class TickAggregatorService implements ITickAggregatorService {
     Bson filter = Filters.and(Filters.gte("Time", startDate), Filters.lte("Time", endDate));
     FindIterable<Document> foundTicks = collection.find(filter);
 
-    //return this.getAggregator(barType, arg).aggregateIntoPriceBars(foundTicks, from, to);
-
-    return this.aggregateIntoPriceBars(foundTicks, from, to, barType);
+    return this.getAggregatorFor(barType)
+               .aggregateIntoPriceBars(foundTicks, from, to, barType, barTypeArg);
   }
 
-  private List<PriceBar> aggregateIntoPriceBars(FindIterable<Document> foundTicks, DateTime from, DateTime to, PriceBarType barType) {
+  private ITickAggregator getAggregatorFor(PriceBarType barType){
     switch(barType){
-      case Tick: return aggregateIntoTickBars(foundTicks, from, to);
-      case Volume: return aggregateIntoVolumeBars(foundTicks, from, to);
-      case Time: return aggregateIntoTimeBars(foundTicks, from, to);
-      default:
-        throw new MarketDataServerException("Unknown PriceBarType: " + barType);
+      case Tick: return new TickTickAggregator();
+      case Renko: return new RenkoTickAggregator();
+      case Volume: return new VolumeTickAggregator();
+      case Time: return new TimeTickAggregator();
+      case Range: return new RangeTickAggregator();
+      default: throw new MarketDataServerException("The PriceBarType " + barType + " has no known aggregator");
     }
-  }
-
-  private List<PriceBar> aggregateIntoTimeBars(FindIterable<Document> foundTicks, DateTime from, DateTime to) {
-    List<PriceBar> priceBars = new ArrayList<>();
-    // TODO
-    PriceBar p = new PriceBar();
-    p.setTime(DateTime.now());
-    p.setOpen(BigDecimal.valueOf(1));
-    p.setHigh(BigDecimal.valueOf(2));
-    p.setLow(BigDecimal.valueOf(0));
-    p.setClose(BigDecimal.valueOf(1));
-    p.setVolume(BigDecimal.valueOf(123));
-    priceBars.add(p);
-    return priceBars;
-  }
-
-  private List<PriceBar> aggregateIntoVolumeBars(FindIterable<Document> foundTicks, DateTime from, DateTime to) {
-    List<PriceBar> priceBars = new ArrayList<>();
-    // TODO
-    PriceBar p = new PriceBar();
-    p.setTime(DateTime.now());
-    p.setOpen(BigDecimal.valueOf(1));
-    p.setHigh(BigDecimal.valueOf(2));
-    p.setLow(BigDecimal.valueOf(0));
-    p.setClose(BigDecimal.valueOf(1));
-    p.setVolume(BigDecimal.valueOf(123));
-    priceBars.add(p);
-    return priceBars;
-  }
-
-  private List<PriceBar> aggregateIntoTickBars(FindIterable<Document> foundTicks, DateTime from, DateTime to) {
-    List<PriceBar> priceBars = new ArrayList<>();
-    // TODO
-    PriceBar p = new PriceBar();
-    p.setTime(DateTime.now());
-    p.setOpen(BigDecimal.valueOf(1));
-    p.setHigh(BigDecimal.valueOf(2));
-    p.setLow(BigDecimal.valueOf(0));
-    p.setClose(BigDecimal.valueOf(1));
-    p.setVolume(BigDecimal.valueOf(123));
-    priceBars.add(p);
-    return priceBars;
   }
 }
 

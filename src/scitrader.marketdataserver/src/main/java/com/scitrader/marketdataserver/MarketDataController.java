@@ -43,6 +43,7 @@ public class MarketDataController implements IMarketDataController {
   }
 
   private void onError(RuntimeException e, Request req, Response res) {
+    Log.error("Error in request " + req.url(), e);
     res.status(400);
     res.body(e.toString());
   }
@@ -72,7 +73,8 @@ public class MarketDataController implements IMarketDataController {
             marketidentifiercode,
             from,
             to,
-            priceBarType);
+            priceBarType,
+            arg);
 
     return JsonStream.serialize(priceBars);
   }

@@ -7,7 +7,6 @@ public class InfoMessage {
   private String docs;
   Limit LimitObject;
 
-
   // Getter Methods
 
   public String getInfo() {

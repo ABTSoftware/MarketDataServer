@@ -8,5 +8,11 @@ import java.util.List;
 
 public interface ITickAggregatorService {
 
-  List<PriceBar> getPriceBars(String exchangeCode, String marketDataIdentifier, DateTime from, DateTime to, PriceBarType barType);
+  List<PriceBar> getPriceBars(
+          String exchangeCode,
+          String marketDataIdentifier,
+          DateTime from,
+          DateTime to,
+          PriceBarType barType,
+          Object barTypeArg);
 }
