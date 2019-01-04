@@ -1,16 +1,25 @@
 package com.scitrader.marketdataserver.common;
 
+import com.jsoniter.annotation.JsonProperty;
 import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 
 public class PriceBar {
+
+  @JsonProperty("time")
   private DateTime time;
+  @JsonProperty("open")
   private BigDecimal open;
+  @JsonProperty("high")
   private BigDecimal high;
+  @JsonProperty("low")
   private BigDecimal low;
+  @JsonProperty("close")
   private BigDecimal close;
+  @JsonProperty("volume")
   private BigDecimal volume;
+
 
   public DateTime getTime() {
     return time;

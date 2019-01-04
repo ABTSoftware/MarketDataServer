@@ -2,34 +2,31 @@ package com.scitrader.marketdataserver;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.scitrader.marketdataserver.datastore.ITickAggregator;
 import com.scitrader.marketdataserver.exchange.bitmex.IBitmexWebsocketClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.Calendar;
-
-import static spark.Spark.*;
 
 @Singleton
 public class MarketDataServer implements IMarketDataServer{
 
   Logger Log = LogManager.getLogger(MarketDataServer.class);
   private IBitmexWebsocketClient wsClient;
+  private IMarketDataController marketDataController;
+  private ITickAggregator tickAggregator;
 
   @Inject
-  public MarketDataServer(IBitmexWebsocketClient wsClient){
+  public MarketDataServer(IBitmexWebsocketClient wsClient,
+                          IMarketDataController marketDataController){
 
     this.wsClient = wsClient;
+    this.marketDataController = marketDataController;
   }
 
   @Override
   public synchronized void Run() {
 
-    // Setup Rest API endpoints
-    get("/hello", (req, res)->{
-      return "Affirmative Dave, the com.scitrader.marketdataserver is online";
-    });
-
+    this.marketDataController.init();
     this.wsClient.connect();
 
     // Wait

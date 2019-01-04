@@ -17,6 +17,7 @@ public class MarketDataServerModule extends AbstractModule {
     bind(IBitmexWebsocketClient.class).to(BitmexWebsocketClient.class);
     bind(IMongoDbService.class).to(MongoDbService.class).asEagerSingleton();
     bind(ITickAggregator.class).to(TickAggregator.class).asEagerSingleton();
+    bind(IMarketDataController.class).to(MarketDataController.class).asEagerSingleton();
   }
 
 }

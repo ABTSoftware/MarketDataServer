@@ -51,6 +51,7 @@ public class TickAggregator implements ITickAggregator {
         }
    */
 
+  @Override
   public List<PriceBar> getPriceBars(String instrument, DateTime from, DateTime to, PriceBarType barType){
 
     Log.info(String.format("Received request for instrument %s from %s to $s, PriceBarType $s", instrument, from, to, barType));

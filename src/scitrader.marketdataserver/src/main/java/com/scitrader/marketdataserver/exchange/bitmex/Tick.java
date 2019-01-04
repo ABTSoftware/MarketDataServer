@@ -21,7 +21,7 @@ public class Tick  {
   private float homeNotional;
   private float foreignNotional;
 
-  private static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").withLocale(Locale.US)
+  public static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").withLocale(Locale.US)
           .withChronology(ISOChronology.getInstanceUTC());
 
   // Getter Methods

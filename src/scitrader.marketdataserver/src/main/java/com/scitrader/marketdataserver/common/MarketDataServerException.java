@@ -1,5 +1,8 @@
 package com.scitrader.marketdataserver.common;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 public class MarketDataServerException extends RuntimeException {
 
         public MarketDataServerException() {
