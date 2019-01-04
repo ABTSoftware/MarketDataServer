@@ -128,4 +128,14 @@ public class Tick  {
     doc.append("Size", getSize() * (getSide().toUpperCase(Locale.US) == "BUY" ? 1f : -1f));
     return doc;
   }
+
+  public static Tick fromBsonDocument(String symbol, Document document){
+    Tick t = new Tick();
+    t.setSymbol(symbol);
+    t.setSize((float)document.get("Size"));
+    t.setPrice((float)document.get("Price"));
+    t.setTimestamp(new DateTime((long)document.get("Time")).toString(formatter));
+    t.setSide(t.getSize() < 0 ? "Sell" : "Buy");
+    return t;
+  }
 }

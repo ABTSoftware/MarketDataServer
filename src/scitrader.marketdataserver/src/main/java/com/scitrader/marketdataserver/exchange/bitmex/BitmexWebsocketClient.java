@@ -29,8 +29,7 @@ public class BitmexWebsocketClient implements IBitmexWebsocketClient{
 
     Guard.NotNull(mongoDbService, "MongoDbService must not be null");
 
-    MongoClient mongoClient = mongoDbService.getMongoClient();
-    this.mongoDatabase = mongoClient.getDatabase("com_scitrader_marketdataserver");
+    this.mongoDatabase = mongoDbService.getTickDatabase();
   }
 
   public void connect()  {
