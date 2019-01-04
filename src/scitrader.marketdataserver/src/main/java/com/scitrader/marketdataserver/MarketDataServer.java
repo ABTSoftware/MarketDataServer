@@ -2,7 +2,7 @@ package com.scitrader.marketdataserver;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import com.scitrader.marketdataserver.datastore.ITickAggregator;
+import com.scitrader.marketdataserver.datastore.ITickAggregatorService;
 import com.scitrader.marketdataserver.exchange.bitmex.IBitmexWebsocketClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,7 +13,7 @@ public class MarketDataServer implements IMarketDataServer{
   Logger Log = LogManager.getLogger(MarketDataServer.class);
   private IBitmexWebsocketClient wsClient;
   private IMarketDataController marketDataController;
-  private ITickAggregator tickAggregator;
+  private ITickAggregatorService tickAggregator;
 
   @Inject
   public MarketDataServer(IBitmexWebsocketClient wsClient,
@@ -27,7 +27,7 @@ public class MarketDataServer implements IMarketDataServer{
   public synchronized void Run() {
 
     this.marketDataController.init();
-    this.wsClient.connect();
+    //this.wsClient.connect();
 
     // Wait
     while(true){

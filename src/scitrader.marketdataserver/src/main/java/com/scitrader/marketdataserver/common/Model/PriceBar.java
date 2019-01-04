@@ -1,4 +1,4 @@
-package com.scitrader.marketdataserver.common;
+package com.scitrader.marketdataserver.common.Model;
 
 import com.jsoniter.annotation.JsonProperty;
 import org.joda.time.DateTime;

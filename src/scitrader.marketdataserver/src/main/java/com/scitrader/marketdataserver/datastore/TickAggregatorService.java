@@ -3,12 +3,10 @@ package com.scitrader.marketdataserver.datastore;
 import com.google.inject.Inject;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
 import com.scitrader.marketdataserver.common.MarketDataServerException;
-import com.scitrader.marketdataserver.common.PriceBar;
-import com.scitrader.marketdataserver.common.PriceBarType;
-import com.scitrader.marketdataserver.exchange.bitmex.Tick;
+import com.scitrader.marketdataserver.common.Model.PriceBar;
+import com.scitrader.marketdataserver.common.Model.PriceBarType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
@@ -18,20 +16,16 @@ import org.joda.time.DateTime;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import static com.mongodb.client.model.Filters.*;
-import static com.scitrader.marketdataserver.common.PriceBarType.*;
-
-public class TickAggregator implements ITickAggregator {
+public class TickAggregatorService implements ITickAggregatorService {
 
   private IMongoDbService mongoDbService;
 
-  private static final Logger Log = LogManager.getLogger(TickAggregator.class);
+  private static final Logger Log = LogManager.getLogger(TickAggregatorService.class);
 
   @Inject
-  public TickAggregator(IMongoDbService mongoDbService){
+  public TickAggregatorService(IMongoDbService mongoDbService){
     this.mongoDbService = mongoDbService;
   }
 
@@ -52,33 +46,34 @@ public class TickAggregator implements ITickAggregator {
    */
 
   @Override
-  public List<PriceBar> getPriceBars(String instrument, DateTime from, DateTime to, PriceBarType barType){
+  public List<PriceBar> getPriceBars(String exchangeCode, String marketDataIdentifier, DateTime from, DateTime to, PriceBarType barType){
 
-    Log.info(String.format("Received request for instrument %s from %s to $s, PriceBarType $s", instrument, from, to, barType));
+    String fullInstrumentName = exchangeCode + ":" + marketDataIdentifier;
 
-    if (!this.mongoDbService.containsCollection(instrument)){
-      throw new MarketDataServerException("The collection name " + instrument + " does not exist in the Database");
+    if (!this.mongoDbService.containsCollection(fullInstrumentName)){
+      throw new MarketDataServerException("The collection name '" + fullInstrumentName + "' does not exist in the Database");
     }
 
-    String symbol = instrument.substring(instrument.indexOf(':')+1, instrument.length() - 1);
-    Log.info(String.format("Parsing symbol %s from '%s'", symbol, instrument));
+    Log.info("Fetching DB collection " + fullInstrumentName);
+    MongoCollection<Document> collection = this.mongoDbService.getTickDatabase().getCollection(fullInstrumentName);
 
     long startDate = from.getMillis();
     long endDate = to.getMillis();
-    MongoCollection<Document> collection = this.mongoDbService.getTickDatabase().getCollection(instrument);
 
+    Log.info(String.format("Filtering by start='%d', end='%d", startDate, endDate));
     Bson filter = Filters.and(Filters.gte("Time", startDate), Filters.lte("Time", endDate));
-
     FindIterable<Document> foundTicks = collection.find(filter);
+
+    //return this.getAggregator(barType, arg).aggregateIntoPriceBars(foundTicks, from, to);
 
     return this.aggregateIntoPriceBars(foundTicks, from, to, barType);
   }
 
   private List<PriceBar> aggregateIntoPriceBars(FindIterable<Document> foundTicks, DateTime from, DateTime to, PriceBarType barType) {
     switch(barType){
-      case TickBar: return aggregateIntoTickBars(foundTicks, from, to);
-      case VolumeBar: return aggregateIntoVolumeBars(foundTicks, from, to);
-      case TimeBar: return aggregateIntoTimeBars(foundTicks, from, to);
+      case Tick: return aggregateIntoTickBars(foundTicks, from, to);
+      case Volume: return aggregateIntoVolumeBars(foundTicks, from, to);
+      case Time: return aggregateIntoTimeBars(foundTicks, from, to);
       default:
         throw new MarketDataServerException("Unknown PriceBarType: " + barType);
     }

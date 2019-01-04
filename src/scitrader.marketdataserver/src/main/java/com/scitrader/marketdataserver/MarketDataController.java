@@ -1,14 +1,12 @@
 package com.scitrader.marketdataserver;
 
 import com.google.inject.Inject;
-import com.jsoniter.JsonIterator;
 import com.jsoniter.output.JsonStream;
-import com.jsoniter.spi.JsoniterSpi;
-import com.scitrader.marketdataserver.common.JodaTimeSerializer;
-import com.scitrader.marketdataserver.common.MarketDataServerException;
-import com.scitrader.marketdataserver.common.PriceBar;
-import com.scitrader.marketdataserver.common.PriceBarType;
-import com.scitrader.marketdataserver.datastore.ITickAggregator;
+import com.scitrader.marketdataserver.common.Utility.DateUtil;
+import com.scitrader.marketdataserver.common.Utility.JodaTimeSerializer;
+import com.scitrader.marketdataserver.common.Model.PriceBar;
+import com.scitrader.marketdataserver.common.Model.PriceBarType;
+import com.scitrader.marketdataserver.datastore.ITickAggregatorService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.joda.time.DateTime;
@@ -21,12 +19,12 @@ import static spark.Spark.*;
 
 public class MarketDataController implements IMarketDataController {
 
-  private ITickAggregator tickAggregator;
+  private ITickAggregatorService tickAggregator;
 
   Logger Log = LogManager.getLogger(MarketDataController.class);
 
   @Inject
-  public MarketDataController(ITickAggregator tickAggregator){
+  public MarketDataController(ITickAggregatorService tickAggregator){
 
     this.tickAggregator = tickAggregator;
   }
@@ -39,7 +37,7 @@ public class MarketDataController implements IMarketDataController {
     // Setup Rest API endpoints
     get("/hello", (r,rs) -> onHello(r,rs));
 
-    get("marketdata/:exchangecode/:marketidentifiercode", (r, rs) -> onMarketData(r,rs));
+    get("marketdata/:exchange/:symbol/:start/:end/:bartype/:arg", (r, rs) -> onMarketData(r,rs));
 
     exception(RuntimeException.class, (e, req, res) -> onError(e,req,res));
   }
@@ -50,15 +48,31 @@ public class MarketDataController implements IMarketDataController {
   }
 
   private Object onMarketData(Request req, Response res) {
-    String exchangeCode = req.params("exchangecode");
-    String marketidentifiercode = req.params("marketidentifiercode");
+    String exchangeCode = req.params("exchange");
+    String marketidentifiercode = req.params("symbol");
+    String startDate = req.params("start");
+    String endDate = req.params("end");
+    String barType = req.params("bartype");
+    String arg = req.params("arg");
 
-    Log.info("Received marketdata request with exchangecode=%s, marketidentifiercode=%s",
+    Log.info(String.format("Received marketdata request with exchange=%s, symbol=%s, start=%s, end=%s, bartype=%s, arg=%s",
             exchangeCode,
-            marketidentifiercode);
+            marketidentifiercode,
+            startDate,
+            endDate,
+            barType,
+            arg));
 
-    List<PriceBar> priceBars = tickAggregator.getPriceBars(exchangeCode + ":" + marketidentifiercode,
-            DateTime.now().minusHours(1), DateTime.now(), PriceBarType.TimeBar);
+    PriceBarType priceBarType = PriceBarType.valueOf(barType);
+    DateTime from = DateUtil.getTickFormatter().parseDateTime(startDate);
+    DateTime to = DateUtil.getTickFormatter().parseDateTime(endDate);
+
+    List<PriceBar> priceBars = tickAggregator.getPriceBars(
+            exchangeCode,
+            marketidentifiercode,
+            from,
+            to,
+            priceBarType);
 
     return JsonStream.serialize(priceBars);
   }

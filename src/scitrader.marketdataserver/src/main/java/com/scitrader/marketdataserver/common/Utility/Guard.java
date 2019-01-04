@@ -1,4 +1,6 @@
-package com.scitrader.marketdataserver.common;
+package com.scitrader.marketdataserver.common.Utility;
+
+import com.scitrader.marketdataserver.common.ArgumentNullException;
 
 public class Guard {
 

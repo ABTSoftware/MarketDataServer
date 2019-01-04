@@ -1,8 +1,7 @@
 package com.scitrader.marketdataserver.transport;
 
-import com.scitrader.marketdataserver.common.Guard;
+import com.scitrader.marketdataserver.common.Utility.Guard;
 import com.scitrader.marketdataserver.common.MarketDataServerException;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.TriConsumer;

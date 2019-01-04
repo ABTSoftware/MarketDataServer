@@ -3,10 +3,9 @@ package com.scitrader.marketdataserver.exchange.bitmex;
 
 import com.google.inject.Inject;
 import com.jsoniter.JsonIterator;
-import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.scitrader.marketdataserver.common.Guard;
+import com.scitrader.marketdataserver.common.Utility.Guard;
 import com.scitrader.marketdataserver.common.MarketDataServerException;
 import com.scitrader.marketdataserver.datastore.IMongoDbService;
 import com.scitrader.marketdataserver.transport.SciTraderWebsocketClient;

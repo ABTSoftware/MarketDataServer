@@ -1,11 +1,8 @@
 package com.scitrader.marketdataserver.exchange.bitmex;
 
+import com.scitrader.marketdataserver.common.Utility.DateUtil;
 import org.bson.Document;
-import org.bson.types.ObjectId;
 import org.joda.time.DateTime;
-import org.joda.time.chrono.ISOChronology;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.util.Locale;
 
@@ -20,9 +17,6 @@ public class Tick  {
   private float grossValue;
   private float homeNotional;
   private float foreignNotional;
-
-  public static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ss.SSSZZ").withLocale(Locale.US)
-          .withChronology(ISOChronology.getInstanceUTC());
 
   // Getter Methods
 
@@ -115,7 +109,7 @@ public class Tick  {
 
   public DateTime getTimeStampAsDate(){
     // e.g. 2019-01-04T12:17:00.980Z
-    DateTime dt = formatter.parseDateTime(getTimestamp());
+    DateTime dt = DateUtil.getTickFormatter().parseDateTime(getTimestamp());
     return dt;
   }
 
@@ -134,7 +128,7 @@ public class Tick  {
     t.setSymbol(symbol);
     t.setSize((float)document.get("Size"));
     t.setPrice((float)document.get("Price"));
-    t.setTimestamp(new DateTime((long)document.get("Time")).toString(formatter));
+    t.setTimestamp(new DateTime((long)document.get("Time")).toString(DateUtil.getTickFormatter()));
     t.setSide(t.getSize() < 0 ? "Sell" : "Buy");
     return t;
   }
