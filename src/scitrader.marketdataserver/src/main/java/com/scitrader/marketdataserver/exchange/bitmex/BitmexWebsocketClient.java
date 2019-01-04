@@ -1,13 +1,20 @@
 package com.scitrader.marketdataserver.exchange.bitmex;
 
 
+import com.google.inject.Inject;
 import com.jsoniter.JsonIterator;
 import com.jsoniter.any.Any;
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.scitrader.marketdataserver.common.Guard;
 import com.scitrader.marketdataserver.common.MarketDataServerException;
+import com.scitrader.marketdataserver.datastore.IMongoDbService;
 import com.scitrader.marketdataserver.transport.SciTraderWebsocketClient;
 import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.bson.Document;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
 
@@ -16,13 +23,19 @@ import java.net.URISyntaxException;
 
 public class BitmexWebsocketClient implements IBitmexWebsocketClient{
 
-  Logger Log = LogManager.getLogger(BitmexWebsocketClient.class);
+  private static final Logger Log = LogManager.getLogger(BitmexWebsocketClient.class);
 
   private final String apiUrl = "wss://www.bitmex.com/realtime";
   private final String[] instruments = new String[] { "XBTUSD" };
+  private final MongoDatabase mongoDatabase;
 
-  public BitmexWebsocketClient() {
+  @Inject
+  public BitmexWebsocketClient(IMongoDbService mongoDbService) {
 
+    Guard.NotNull(mongoDbService, "MongoDbService must not be null");
+
+    MongoClient mongoClient = mongoDbService.getMongoClient();
+    this.mongoDatabase = mongoClient.getDatabase("com_scitrader_marketdataserver");
   }
 
   public void connect()  {
@@ -34,7 +47,7 @@ public class BitmexWebsocketClient implements IBitmexWebsocketClient{
             o -> Log.info("Opened websocket"),
             m -> onMessage(m),
             (i,s,b) -> Log.info("Socket closed..."),
-            ex -> Log.info("Socket error!"));
+            ex -> Log.error("Socket error!", ex));
 
     Log.info("Starting connection");
 
@@ -56,14 +69,19 @@ public class BitmexWebsocketClient implements IBitmexWebsocketClient{
         Log.info("Ignoring partial trade message: " + message);
       }
       else if (message.contains("insert")){
-        TicksMessage tick = JsonIterator.deserialize(message, TicksMessage.class);
-        Log.info("Received data: " + tick.data);
+        TicksMessage ticks = JsonIterator.deserialize(message, TicksMessage.class);
+        for(Tick t : ticks.data){
+          String symbol = t.getSymbol();
+          MongoCollection<Document> collection = mongoDatabase.getCollection(symbol);
+          Document doc = t.toBsonDocument();
+          collection.insertOne(doc);
+        }
+        Log.info("Received data: " + ticks.data);
       }
     }
     else {
       throw new MarketDataServerException("The message type has no associated deserializer. Message=" + message);
     }
-
   }
 
   private URI getUri(){

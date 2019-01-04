@@ -1,6 +1,10 @@
 package com.scitrader.marketdataserver.exchange.bitmex;
 
-public class Tick {
+import org.bson.Document;
+
+import java.util.Locale;
+
+public class Tick  {
   private String timestamp;
   private String symbol;
   private String side;
@@ -100,5 +104,15 @@ public class Tick {
   @Override
   public String toString() {
     return String.format("%s, %s, %s at %s on %s", getSymbol(), getSide(), getSize(), getPrice(), getTimestamp());
+  }
+
+  public Document toBsonDocument(){
+    Document doc = new Document();
+    doc.append("_id", getTrdMatchID());
+    doc.append("Time", getTimestamp());
+    doc.append("Symbol", getSymbol());
+    doc.append("Price", getPrice());
+    doc.append("Size", getSize() * (getSide().toUpperCase(Locale.US) == "BUY" ? 1f : -1f));
+    return doc;
   }
 }
