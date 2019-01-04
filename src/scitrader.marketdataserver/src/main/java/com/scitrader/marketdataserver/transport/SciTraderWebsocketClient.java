@@ -28,11 +28,11 @@ public class SciTraderWebsocketClient extends WebSocketClient {
 
     super(serverUri);
 
-    Guard.NotNull(serverUri, "Server URI cannot be null");
-    Guard.NotNull(onOpen, "OnOpen consumer cannot be null");
-    Guard.NotNull(onMessage, "OnMessage consumer cannot be null");
-    Guard.NotNull(onClose, "OnClose consumer cannot be null");
-    Guard.NotNull(onError, "OnError consumer cannot be null");
+    Guard.assertNotNull(serverUri, "Server URI cannot be null");
+    Guard.assertNotNull(onOpen, "OnOpen consumer cannot be null");
+    Guard.assertNotNull(onMessage, "OnMessage consumer cannot be null");
+    Guard.assertNotNull(onClose, "OnClose consumer cannot be null");
+    Guard.assertNotNull(onError, "OnError consumer cannot be null");
 
     this.onOpen = onOpen;
     this.onMessage = onMessage;

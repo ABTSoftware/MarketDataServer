@@ -26,7 +26,7 @@ public class BitmexWebsocketClient implements IBitmexWebsocketClient{
   @Inject
   public BitmexWebsocketClient(IMongoDbService mongoDbService) {
 
-    Guard.NotNull(mongoDbService, "MongoDbService must not be null");
+    Guard.assertNotNull(mongoDbService, "MongoDbService must not be null");
 
     this.mongoDatabase = mongoDbService.getTickDatabase();
   }
