@@ -8,6 +8,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Calendar;
 
+import static spark.Spark.*;
+
 @Singleton
 public class MarketDataServer implements IMarketDataServer{
 
@@ -23,11 +25,16 @@ public class MarketDataServer implements IMarketDataServer{
   @Override
   public synchronized void Run() {
 
+    // Setup Rest API endpoints
+    get("/hello", (req, res)->{
+      return "Affirmative Dave, the com.scitrader.marketdataserver is online";
+    });
+
     this.wsClient.connect();
 
     // Wait
     while(true){
-      Log.info("server status ==> " + Calendar.getInstance().getTime());
+      //Log.info("server status ==> " + Calendar.getInstance().getTime());
       try {
         this.wait(2000);
       } catch (InterruptedException e) {

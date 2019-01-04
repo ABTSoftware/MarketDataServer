@@ -16,6 +16,7 @@ import org.bson.conversions.Bson;
 import org.joda.time.DateTime;
 
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -83,15 +84,45 @@ public class TickAggregator implements ITickAggregator {
   }
 
   private List<PriceBar> aggregateIntoTimeBars(FindIterable<Document> foundTicks, DateTime from, DateTime to) {
-    throw new MarketDataServerException("TODO");
+    List<PriceBar> priceBars = new ArrayList<>();
+    // TODO
+    PriceBar p = new PriceBar();
+    p.setTime(DateTime.now());
+    p.setOpen(BigDecimal.valueOf(1));
+    p.setHigh(BigDecimal.valueOf(2));
+    p.setLow(BigDecimal.valueOf(0));
+    p.setClose(BigDecimal.valueOf(1));
+    p.setVolume(BigDecimal.valueOf(123));
+    priceBars.add(p);
+    return priceBars;
   }
 
   private List<PriceBar> aggregateIntoVolumeBars(FindIterable<Document> foundTicks, DateTime from, DateTime to) {
-    throw new MarketDataServerException("TODO");
+    List<PriceBar> priceBars = new ArrayList<>();
+    // TODO
+    PriceBar p = new PriceBar();
+    p.setTime(DateTime.now());
+    p.setOpen(BigDecimal.valueOf(1));
+    p.setHigh(BigDecimal.valueOf(2));
+    p.setLow(BigDecimal.valueOf(0));
+    p.setClose(BigDecimal.valueOf(1));
+    p.setVolume(BigDecimal.valueOf(123));
+    priceBars.add(p);
+    return priceBars;
   }
 
   private List<PriceBar> aggregateIntoTickBars(FindIterable<Document> foundTicks, DateTime from, DateTime to) {
-    throw new MarketDataServerException("TODO");
+    List<PriceBar> priceBars = new ArrayList<>();
+    // TODO
+    PriceBar p = new PriceBar();
+    p.setTime(DateTime.now());
+    p.setOpen(BigDecimal.valueOf(1));
+    p.setHigh(BigDecimal.valueOf(2));
+    p.setLow(BigDecimal.valueOf(0));
+    p.setClose(BigDecimal.valueOf(1));
+    p.setVolume(BigDecimal.valueOf(123));
+    priceBars.add(p);
+    return priceBars;
   }
 }
 
