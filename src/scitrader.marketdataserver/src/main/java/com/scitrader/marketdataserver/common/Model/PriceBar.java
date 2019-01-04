@@ -3,23 +3,27 @@ package com.scitrader.marketdataserver.common.Model;
 import com.jsoniter.annotation.JsonProperty;
 import org.joda.time.DateTime;
 
-import java.math.BigDecimal;
-
 public class PriceBar {
 
   @JsonProperty("time")
   private DateTime time;
   @JsonProperty("open")
-  private BigDecimal open;
+  private double open;
   @JsonProperty("high")
-  private BigDecimal high;
+  private double high;
   @JsonProperty("low")
-  private BigDecimal low;
+  private double low;
   @JsonProperty("close")
-  private BigDecimal close;
+  private double close;
   @JsonProperty("volume")
-  private BigDecimal volume;
+  private double volume;
 
+  public PriceBar(){
+  }
+  
+  public PriceBar(DateTime time, double open, double high, double low, double close, double volume){
+    
+  }
 
   public DateTime getTime() {
     return time;
@@ -29,43 +33,43 @@ public class PriceBar {
     this.time = time;
   }
 
-  public BigDecimal getOpen() {
+  public double getOpen() {
     return open;
   }
 
-  public void setOpen(BigDecimal open) {
+  public void setOpen(double open) {
     this.open = open;
   }
 
-  public BigDecimal getHigh() {
+  public double getHigh() {
     return high;
   }
 
-  public void setHigh(BigDecimal high) {
+  public void setHigh(double high) {
     this.high = high;
   }
 
-  public BigDecimal getLow() {
+  public double getLow() {
     return low;
   }
 
-  public void setLow(BigDecimal low) {
+  public void setLow(double low) {
     this.low = low;
   }
 
-  public BigDecimal getClose() {
+  public double getClose() {
     return close;
   }
 
-  public void setClose(BigDecimal close) {
+  public void setClose(double close) {
     this.close = close;
   }
 
-  public BigDecimal getVolume() {
+  public double getVolume() {
     return volume;
   }
 
-  public void setVolume(BigDecimal volume) {
+  public void setVolume(double volume) {
     this.volume = volume;
   }
 }

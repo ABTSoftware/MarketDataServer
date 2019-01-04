@@ -1,9 +1,7 @@
 package com.scitrader.marketdataserver.datastore;
 
 import com.google.inject.Inject;
-import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.Filters;
 import com.scitrader.marketdataserver.common.MarketDataServerException;
 import com.scitrader.marketdataserver.common.Model.PriceBar;
 import com.scitrader.marketdataserver.common.Model.PriceBarType;
@@ -11,12 +9,9 @@ import com.scitrader.marketdataserver.datastore.aggregators.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
-import org.bson.conversions.Bson;
 import org.joda.time.DateTime;
 
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TickAggregatorService implements ITickAggregatorService {
@@ -64,15 +59,8 @@ public class TickAggregatorService implements ITickAggregatorService {
     Log.info("Fetching DB collection " + fullInstrumentName);
     MongoCollection<Document> collection = this.mongoDbService.getTickDatabase().getCollection(fullInstrumentName);
 
-    long startDate = from.getMillis();
-    long endDate = to.getMillis();
-
-    Log.info(String.format("Filtering by start='%d', end='%d", startDate, endDate));
-    Bson filter = Filters.and(Filters.gte("Time", startDate), Filters.lte("Time", endDate));
-    FindIterable<Document> foundTicks = collection.find(filter);
-
     return this.getAggregatorFor(barType)
-               .aggregateIntoPriceBars(foundTicks, from, to, barType, barTypeArg);
+               .fetchAndAggregate(collection, marketDataIdentifier, from, to, barType, barTypeArg);
   }
 
   private ITickAggregator getAggregatorFor(PriceBarType barType){

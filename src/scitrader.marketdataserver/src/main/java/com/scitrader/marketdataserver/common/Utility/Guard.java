@@ -12,7 +12,7 @@ public class Guard {
   }
 
   public static void assertIsTrue(boolean expression, String message) {
-    if (expression){
+    if (!expression){
       throw new ArgumentException(message);
     }
   }

@@ -1,5 +1,6 @@
 package com.scitrader.marketdataserver.exchange.bitmex;
 
+import com.jsoniter.annotation.JsonIgnore;
 import com.scitrader.marketdataserver.common.Utility.DateUtil;
 import org.bson.Document;
 import org.joda.time.DateTime;
@@ -7,6 +8,8 @@ import org.joda.time.DateTime;
 import java.util.Locale;
 
 public class Tick  {
+  @JsonIgnore
+  DateTime dateTime;
   private String timestamp;
   private String symbol;
   private String side;
@@ -108,9 +111,16 @@ public class Tick  {
   }
 
   public DateTime getTimeStampAsDate(){
+
+    if (dateTime == null && getTimestamp() != null){
+      dateTime = DateUtil.getTickFormatter().parseDateTime(getTimestamp());
+    }
     // e.g. 2019-01-04T12:17:00.980Z
-    DateTime dt = DateUtil.getTickFormatter().parseDateTime(getTimestamp());
-    return dt;
+    return dateTime;
+  }
+
+  public void setTimeStampAsDate(DateTime dateTime){
+    this.dateTime = dateTime;
   }
 
   public Document toBsonDocument(){
@@ -120,6 +130,7 @@ public class Tick  {
     doc.append("Time", getTimeStampAsDate().getMillis());
     doc.append("Price", getPrice());
     doc.append("Size", getSize() * (getSide().toUpperCase(Locale.US) == "BUY" ? 1f : -1f));
+
     return doc;
   }
 
@@ -128,7 +139,7 @@ public class Tick  {
     t.setSymbol(symbol);
     t.setSize((float)document.get("Size"));
     t.setPrice((float)document.get("Price"));
-    t.setTimestamp(new DateTime((long)document.get("Time")).toString(DateUtil.getTickFormatter()));
+    t.setTimeStampAsDate(new DateTime((long)document.get("Time")));
     t.setSide(t.getSize() < 0 ? "Sell" : "Buy");
     return t;
   }

@@ -1,6 +1,6 @@
 package com.scitrader.marketdataserver.datastore.aggregators;
 
-import com.mongodb.client.FindIterable;
+import com.mongodb.client.MongoCollection;
 import com.scitrader.marketdataserver.common.Model.PriceBar;
 import com.scitrader.marketdataserver.common.Model.PriceBarType;
 import org.bson.Document;
@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface ITickAggregator {
 
-  List<PriceBar> aggregateIntoPriceBars(FindIterable<Document> foundTicks, DateTime from, DateTime to, PriceBarType priceBarType, Object arg);
+  List<PriceBar> fetchAndAggregate(MongoCollection<Document> ticksCollection, String symbol, DateTime from, DateTime to, PriceBarType priceBarType, Object arg);
 }
 
