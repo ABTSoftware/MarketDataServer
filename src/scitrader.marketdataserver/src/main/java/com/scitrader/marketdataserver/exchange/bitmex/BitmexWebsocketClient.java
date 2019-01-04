@@ -3,7 +3,6 @@ package com.scitrader.marketdataserver.exchange.bitmex;
 
 import com.google.inject.Inject;
 import com.jsoniter.JsonIterator;
-import com.jsoniter.any.Any;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -11,15 +10,11 @@ import com.scitrader.marketdataserver.common.Guard;
 import com.scitrader.marketdataserver.common.MarketDataServerException;
 import com.scitrader.marketdataserver.datastore.IMongoDbService;
 import com.scitrader.marketdataserver.transport.SciTraderWebsocketClient;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.bson.Document;
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class BitmexWebsocketClient implements IBitmexWebsocketClient{
 
@@ -70,18 +65,23 @@ public class BitmexWebsocketClient implements IBitmexWebsocketClient{
       }
       else if (message.contains("insert")){
         TicksMessage ticks = JsonIterator.deserialize(message, TicksMessage.class);
+        Log.info("Received data: " + ticks.data);
         for(Tick t : ticks.data){
-          String symbol = t.getSymbol();
-          MongoCollection<Document> collection = mongoDatabase.getCollection("BITMEX:" + symbol);
+          MongoCollection<Document> collection = getMongoCollection(t);
           Document doc = t.toBsonDocument();
           collection.insertOne(doc);
         }
-        Log.info("Received data: " + ticks.data);
       }
     }
     else {
       throw new MarketDataServerException("The message type has no associated deserializer. Message=" + message);
     }
+  }
+
+  private MongoCollection<Document> getMongoCollection(Tick t) {
+    String symbol = t.getSymbol();
+    MongoCollection<Document> collection = mongoDatabase.getCollection("BITMEX:" + symbol);
+    return collection;
   }
 
   private URI getUri(){
