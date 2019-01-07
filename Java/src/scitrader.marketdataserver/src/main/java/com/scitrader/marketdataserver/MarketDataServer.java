@@ -15,6 +15,7 @@ public class MarketDataServer implements IMarketDataServer{
   private IMarketDataController marketDataController;
   private ITickAggregatorService tickAggregator;
 
+
   @Inject
   public MarketDataServer(IBitmexWebsocketClient wsClient,
                           IMarketDataController marketDataController){
