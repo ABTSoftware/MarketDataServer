@@ -11,10 +11,14 @@ class MarketDataServer : IMarketDataServer {
     private var marketDataController: IMarketDataController
     private val syncObj = java.lang.Object()
 
+    //private var wsClient: IBitmexWebsocketClient
+
     @Inject
-    constructor(marketDataController: IMarketDataController){
+    constructor(//wsClient : IBitmexWebsocketClient,
+                marketDataController: IMarketDataController){
 
         this.marketDataController = marketDataController
+        //this.wsClient = wsClient;
     }
 
     @Synchronized override fun Run() {
