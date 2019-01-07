@@ -12,21 +12,21 @@ class MarketDataServer : IMarketDataServer {
     private var marketDataController: IMarketDataController
     private val syncObj = java.lang.Object()
 
-    private var wsClient: IBitmexWebsocketClient
+    private var bitmexClient: IBitmexWebsocketClient
 
     @Inject
-    constructor(wsClient : IBitmexWebsocketClient,
+    constructor(bitmexClient : IBitmexWebsocketClient,
                 marketDataController: IMarketDataController){
 
         this.marketDataController = marketDataController
-        this.wsClient = wsClient;
+        this.bitmexClient = bitmexClient;
     }
 
     @Synchronized override fun Run() {
         Log.info("The market data server is aliiiive!")
 
         this.marketDataController.Init()
-        this.wsClient.connect()
+        this.bitmexClient.connect()
 
         // Wait
         while (true) {

@@ -6,6 +6,7 @@ import java.net.URI
 
 interface IAutoReconnectWebsocket{
     fun connect()
+    fun stop()
 }
 
 public class AutoReconnectWebsocket : IAutoReconnectWebsocket {
@@ -14,9 +15,14 @@ public class AutoReconnectWebsocket : IAutoReconnectWebsocket {
 
     private var serverUri: URI
     private var isConnected : Boolean = false
+    private var onMessage: (String) -> Unit
+    private var canBeOpened: Boolean = true
 
-    constructor(serverUri : URI)  {
+    private lateinit var ws: SciTraderWebsocketClient
+
+    constructor(serverUri : URI, onMessage : (String) -> Unit)  {
         this.serverUri = serverUri
+        this.onMessage = onMessage;
     }
 
     override fun connect(){
@@ -26,11 +32,31 @@ public class AutoReconnectWebsocket : IAutoReconnectWebsocket {
             throw MarketDataServerException("Socket is already connected")
         }
 
-        val ws = SciTraderWebsocketClient(serverUri,
-                { o -> Log.info("Opened websocket") },
-                { m -> Log.info("Message: " + m) },
-                { i, s, b -> Log.info("Socket closed...") },
-                { ex -> Log.error("Socket error!", ex) })
-        ws.connect()
+        if (!canBeOpened){
+            throw MarketDataServerException("Socket has been closed programmatically, cannot be opened again")
+        }
+
+        this.ws = SciTraderWebsocketClient(serverUri,
+                { o -> Log.info("Opened websocket to $serverUri") },
+                onMessage,
+                { ws, i, s, b -> onClosed(ws, i,s,b) },
+                { ex -> Log.error("Socket error to $serverUri!", ex) })
+        this.ws.connect()
+    }
+
+    override fun stop(){
+        this.canBeOpened = false
+        this.ws.close()
+    }
+
+    private fun onClosed(webSocket : SciTraderWebsocketClient, i: Int, s: String, b: Boolean) {
+
+        if (canBeOpened){
+            Log.info("Websocket to $serverUri closed. Attempting reconnect...")
+            this.isConnected = false
+            this.connect()
+        } else {
+            Log.info("Socket has been closed programmatically, cannot be opened again")
+        }
     }
 }

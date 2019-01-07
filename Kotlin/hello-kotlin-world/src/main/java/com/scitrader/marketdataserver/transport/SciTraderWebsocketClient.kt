@@ -11,7 +11,7 @@ import java.util.function.Consumer
 class SciTraderWebsocketClient(serverUri: URI,
                                private val onOpenFunc: (ServerHandshake) -> Unit,
                                private val onMessageFunc: (String) -> Unit,
-                               private val onCloseFunc: (Int, String, Boolean) -> Unit,
+                               private val onCloseFunc: (SciTraderWebsocketClient, Int, String, Boolean) -> Unit,
                                private val onErrorFunc: (Exception) -> Unit) : WebSocketClient(serverUri) {
 
     companion object {
@@ -32,7 +32,6 @@ class SciTraderWebsocketClient(serverUri: URI,
         } catch (ex: Exception) {
             throw MarketDataServerException()
         }
-
     }
 
     override fun onOpen(handshakedata: ServerHandshake) {
@@ -44,7 +43,7 @@ class SciTraderWebsocketClient(serverUri: URI,
     }
 
     override fun onClose(code: Int, reason: String, remote: Boolean) {
-        this.onCloseFunc(code, reason, remote)
+        this.onCloseFunc(this, code, reason, remote)
     }
 
     override fun onError(ex: Exception) {

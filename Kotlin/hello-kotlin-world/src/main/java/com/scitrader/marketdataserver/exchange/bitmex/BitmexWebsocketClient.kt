@@ -13,22 +13,26 @@ class BitmexWebsocketClient : IBitmexWebsocketClient {
     }
 
     override fun connect() {
-        Log.info("Errrmagerrrsh, I'm connecting...")
 
         val uri = getUri()
-        val ws = AutoReconnectWebsocket(uri)
+        Log.info("Initializing AutoReconnectWebsocket with Uri = " + uri.toString())
+
+        val ws = AutoReconnectWebsocket(uri, { m -> onMessage(m)})
         ws.connect()
+    }
+
+    private fun onMessage(message: String) {
+        Log.info("Websocket message: " + message)
     }
 
     private fun getUri(): URI {
         try {
             val sb = StringBuilder()
             sb.append(apiUrl)
-            //sb.append("?subscribe=instrument");
+
+            // TODO: Configuration file for instruments, or subscribe to all instruments
             sb.append("?subscribe=trade:XBTUSD,trade:ETHUSD")
-            //      for(String inst : instruments){
-            //        sb.append(",trade:").append(inst);
-            //      }
+
             return URI(sb.toString())
         } catch (ex: Exception) {
             throw MarketDataServerException(ex)
