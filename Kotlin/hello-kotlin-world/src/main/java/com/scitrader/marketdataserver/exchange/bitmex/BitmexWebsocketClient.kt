@@ -1,12 +1,19 @@
 package com.scitrader.marketdataserver.exchange.bitmex
 
+import com.google.inject.Inject
 import com.jsoniter.JsonIterator
+import com.mongodb.client.MongoCollection
+import com.mongodb.client.MongoDatabase
 import com.scitrader.marketdataserver.common.MarketDataServerException
+import com.scitrader.marketdataserver.common.Utility.Guard
+import com.scitrader.marketdataserver.datastore.IMongoDbService
 import com.scitrader.marketdataserver.exchange.bitmex.messages.InfoMessage
 import com.scitrader.marketdataserver.exchange.bitmex.messages.SubscribeMessage
+import com.scitrader.marketdataserver.exchange.bitmex.messages.Tick
 import com.scitrader.marketdataserver.exchange.bitmex.messages.TicksMessage
 import com.scitrader.marketdataserver.transport.AutoReconnectWebsocket
 import org.apache.logging.log4j.LogManager
+import org.bson.Document
 import java.net.URI
 
 class BitmexWebsocketClient : IBitmexWebsocketClient {
@@ -14,6 +21,16 @@ class BitmexWebsocketClient : IBitmexWebsocketClient {
     companion object {
         private val Log = LogManager.getLogger(BitmexWebsocketClient::class.java)
         private val apiUrl = "wss://www.bitmex.com/realtime"
+    }
+
+    private var mongoDatabase: MongoDatabase
+
+    @Inject
+    constructor(mongoDbService: IMongoDbService) {
+
+        Guard.assertNotNull(mongoDbService, "MongoDbService must not be null")
+
+        this.mongoDatabase = mongoDbService.tickDatabase
     }
 
     override fun connect() {
@@ -39,15 +56,20 @@ class BitmexWebsocketClient : IBitmexWebsocketClient {
             } else if (message.contains("insert")) {
                 val ticks = JsonIterator.deserialize(message, TicksMessage::class.java)
                 Log.info("Received data: " + ticks.data)
-//                for (t in ticks.data) {
-////                    val collection = getMongoCollection(t)
-////                    val doc = t.toBsonDocument()
-////                    collection.insertOne(doc)
-////                }
+                for (t in ticks.data) {
+                    val collection = getMongoCollection(t)
+                    val doc = t.toBsonDocument()
+                    collection.insertOne(doc)
+                }
             }
         } else {
             throw MarketDataServerException("The message type has no associated deserializer. Message=$message")
         }
+    }
+
+    private fun getMongoCollection(t: Tick): MongoCollection<Document> {
+        val symbol = t.symbol
+        return mongoDatabase.getCollection("BITMEX:$symbol")
     }
 
     private fun getUri(): URI {
