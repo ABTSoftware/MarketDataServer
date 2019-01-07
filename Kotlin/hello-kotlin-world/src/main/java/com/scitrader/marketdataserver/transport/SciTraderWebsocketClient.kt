@@ -6,7 +6,6 @@ import org.apache.logging.log4j.LogManager
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
-import java.util.function.Consumer
 
 class SciTraderWebsocketClient(serverUri: URI,
                                private val onOpenFunc: (ServerHandshake) -> Unit,
