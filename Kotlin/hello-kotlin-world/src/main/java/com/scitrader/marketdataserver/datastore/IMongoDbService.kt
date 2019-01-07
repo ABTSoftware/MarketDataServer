@@ -8,3 +8,4 @@ interface IMongoDbService {
 
     fun containsCollection(collectionName: String): Boolean
 }
+

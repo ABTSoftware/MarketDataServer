@@ -1,7 +1,6 @@
 package com.scitrader.marketdataserver.transport
 
 import com.scitrader.marketdataserver.common.MarketDataServerException
-import com.scitrader.marketdataserver.common.Utility.Guard
 import org.apache.logging.log4j.LogManager
 import org.java_websocket.client.WebSocketClient
 import org.java_websocket.handshake.ServerHandshake
@@ -15,14 +14,6 @@ class SciTraderWebsocketClient(serverUri: URI,
 
     companion object {
         private val Log = LogManager.getLogger(SciTraderWebsocketClient::class.java)
-    }
-
-    init {
-        Guard.assertNotNull(serverUri, "Server URI cannot be null")
-        Guard.assertNotNull(onOpenFunc, "OnOpen consumer cannot be null")
-        Guard.assertNotNull(onMessageFunc, "OnMessage consumer cannot be null")
-        Guard.assertNotNull(onCloseFunc, "OnClose consumer cannot be null")
-        Guard.assertNotNull(onErrorFunc, "OnError consumer cannot be null")
     }
 
     override fun connect() {

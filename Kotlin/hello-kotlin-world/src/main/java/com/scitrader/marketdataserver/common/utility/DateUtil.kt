@@ -1,4 +1,4 @@
-package com.scitrader.marketdataserver.common.Utility
+package com.scitrader.marketdataserver.common.utility
 
 import org.joda.time.DateTime
 import org.joda.time.Duration

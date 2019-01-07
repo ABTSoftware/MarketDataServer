@@ -1,7 +1,7 @@
 package com.scitrader.marketdataserver.exchange.bitmex.messages
 
 import com.jsoniter.annotation.JsonIgnore
-import com.scitrader.marketdataserver.common.Utility.DateUtil
+import com.scitrader.marketdataserver.common.utility.DateUtil
 import org.bson.Document
 import org.joda.time.DateTime
 import java.util.*

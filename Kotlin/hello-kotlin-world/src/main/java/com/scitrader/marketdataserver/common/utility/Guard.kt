@@ -1,4 +1,4 @@
-package com.scitrader.marketdataserver.common.Utility
+package com.scitrader.marketdataserver.common.utility
 
 import com.scitrader.marketdataserver.common.ArgumentException
 import com.scitrader.marketdataserver.common.ArgumentNullException

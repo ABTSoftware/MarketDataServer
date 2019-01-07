@@ -5,7 +5,6 @@ import com.jsoniter.JsonIterator
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.scitrader.marketdataserver.common.MarketDataServerException
-import com.scitrader.marketdataserver.common.Utility.Guard
 import com.scitrader.marketdataserver.datastore.IMongoDbService
 import com.scitrader.marketdataserver.exchange.bitmex.messages.InfoMessage
 import com.scitrader.marketdataserver.exchange.bitmex.messages.SubscribeMessage
@@ -27,8 +26,6 @@ class BitmexWebsocketClient : IBitmexWebsocketClient {
 
     @Inject
     constructor(mongoDbService: IMongoDbService) {
-
-        Guard.assertNotNull(mongoDbService, "MongoDbService must not be null")
 
         this.mongoDatabase = mongoDbService.tickDatabase
     }
