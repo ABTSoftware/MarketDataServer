@@ -32,7 +32,7 @@ public class SciTraderWebsocketClient extends WebSocketClient {
     Guard.assertNotNull(onOpen, "OnOpen consumer cannot be null");
     Guard.assertNotNull(onMessage, "OnMessage consumer cannot be null");
     Guard.assertNotNull(onClose, "OnClose consumer cannot be null");
-    Guard.assertNotNull(onError, "OnError consumer cannot be null");
+    Guard.asseartNotNull(onError, "OnError consumer cannot be null");
 
     this.onOpen = onOpen;
     this.onMessage = onMessage;

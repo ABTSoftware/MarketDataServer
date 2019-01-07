@@ -1,6 +1,7 @@
 package com.scitrader.marketdataserver
 
 import com.google.inject.Inject
+import com.scitrader.marketdataserver.exchange.bitmex.IBitmexWebsocketClient
 import org.apache.logging.log4j.LogManager
 import java.util.*
 
@@ -11,21 +12,22 @@ class MarketDataServer : IMarketDataServer {
     private var marketDataController: IMarketDataController
     private val syncObj = java.lang.Object()
 
-    //private var wsClient: IBitmexWebsocketClient
+    private var wsClient: IBitmexWebsocketClient
 
     @Inject
-    constructor(//wsClient : IBitmexWebsocketClient,
+    constructor(wsClient : IBitmexWebsocketClient,
                 marketDataController: IMarketDataController){
 
         this.marketDataController = marketDataController
-        //this.wsClient = wsClient;
+        this.wsClient = wsClient;
     }
 
     @Synchronized override fun Run() {
         Log.info("The market data server is aliiiive!")
 
         this.marketDataController.Init()
-
+        this.wsClient.connect()
+        
         // Wait
         while (true) {
             Log.info("server status ==> " + Calendar.getInstance().getTime());
