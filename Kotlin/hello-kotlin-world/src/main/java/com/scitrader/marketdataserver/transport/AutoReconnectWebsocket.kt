@@ -4,11 +4,6 @@ import com.scitrader.marketdataserver.common.MarketDataServerException
 import org.apache.logging.log4j.LogManager
 import java.net.URI
 
-interface IAutoReconnectWebsocket{
-    fun connect()
-    fun stop()
-}
-
 public class AutoReconnectWebsocket : IAutoReconnectWebsocket {
 
     private val Log = LogManager.getLogger(AutoReconnectWebsocket::class.java)

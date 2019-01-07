@@ -1,7 +1,6 @@
 package com.scitrader.marketdataserver
 
 import com.google.inject.Guice
-import com.google.inject.Injector
 import org.apache.logging.log4j.LogManager
 
 object MainLogger {
