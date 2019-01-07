@@ -27,7 +27,7 @@ class MarketDataServer : IMarketDataServer {
 
         this.marketDataController.Init()
         this.wsClient.connect()
-        
+
         // Wait
         while (true) {
             Log.info("server status ==> " + Calendar.getInstance().getTime());

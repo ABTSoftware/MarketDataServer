@@ -1,27 +1,36 @@
 package com.scitrader.marketdataserver.transport
 
-import org.java_websocket.client.WebSocketClient
-import org.java_websocket.handshake.ServerHandshake
+import com.scitrader.marketdataserver.common.MarketDataServerException
+import org.apache.logging.log4j.LogManager
 import java.net.URI
 
-public class AutoReconnectWebsocket : WebSocketClient {
+interface IAutoReconnectWebsocket{
+    fun connect()
+}
 
-    constructor(serverUri : URI) : super(serverUri) {
+public class AutoReconnectWebsocket : IAutoReconnectWebsocket {
+
+    private val Log = LogManager.getLogger(AutoReconnectWebsocket::class.java)
+
+    private var serverUri: URI
+    private var isConnected : Boolean = false
+
+    constructor(serverUri : URI)  {
+        this.serverUri = serverUri
     }
 
-    override fun onOpen(handshakedata: ServerHandshake) {
-        //this.onOpen(handshakedata)
-    }
+    override fun connect(){
+        Log.info("AutoReconnectWebsocket.connect()")
 
-    override fun onMessage(message: String) {
-        //this.onMessage(message)
-    }
+        if (isConnected){
+            throw MarketDataServerException("Socket is already connected")
+        }
 
-    override fun onClose(code: Int, reason: String, remote: Boolean) {
-        //this.onClose(code, reason, remote)
-    }
-
-    override fun onError(ex: Exception) {
-        //this.onError(ex)
+        val ws = SciTraderWebsocketClient(serverUri,
+                { o -> Log.info("Opened websocket") },
+                { m -> Log.info("Message: " + m) },
+                { i, s, b -> Log.info("Socket closed...") },
+                { ex -> Log.error("Socket error!", ex) })
+        ws.connect()
     }
 }
