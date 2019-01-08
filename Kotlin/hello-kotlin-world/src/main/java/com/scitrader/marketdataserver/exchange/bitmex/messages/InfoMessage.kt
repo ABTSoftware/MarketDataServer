@@ -1,5 +1,6 @@
 package com.scitrader.marketdataserver.exchange.bitmex.messages
 
+
 class InfoMessage {
     var info: String? = null
     var version: String? = null

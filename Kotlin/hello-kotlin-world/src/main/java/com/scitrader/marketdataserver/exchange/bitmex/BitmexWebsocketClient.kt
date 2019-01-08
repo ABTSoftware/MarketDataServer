@@ -6,10 +6,7 @@ import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.scitrader.marketdataserver.common.MarketDataServerException
 import com.scitrader.marketdataserver.datastore.IMongoDbService
-import com.scitrader.marketdataserver.exchange.bitmex.messages.InfoMessage
-import com.scitrader.marketdataserver.exchange.bitmex.messages.SubscribeMessage
-import com.scitrader.marketdataserver.exchange.bitmex.messages.Tick
-import com.scitrader.marketdataserver.exchange.bitmex.messages.TicksMessage
+import com.scitrader.marketdataserver.exchange.bitmex.messages.*
 import com.scitrader.marketdataserver.transport.AutoReconnectWebsocket
 import org.apache.logging.log4j.LogManager
 import org.bson.Document
@@ -45,11 +42,16 @@ class BitmexWebsocketClient : IBitmexWebsocketClient {
         if (message.contains("info")) {
             val info = JsonIterator.deserialize(message, InfoMessage::class.java)
             Log.info("Received info: " + info.info)
-
-        } else if (message.contains("success")) {
+        }
+        else if (message.contains("status")){
+            val status = JsonIterator.deserialize(message, StatusMessage::class.java)
+            Log.info("Received status message " + status.error);
+        }
+        else if (message.contains("success")) {
             val sub = JsonIterator.deserialize(message, SubscribeMessage::class.java)
             Log.info("Received Subscribe! " + sub.request!!.args)
-        } else if (message.contains("table") && message.contains("trade")) {
+        }
+        else if (message.contains("table") && message.contains("trade")) {
             if (message.contains("partial")) {
                 Log.info("Ignoring partial trade message: $message")
             } else if (message.contains("insert")) {
@@ -66,7 +68,8 @@ class BitmexWebsocketClient : IBitmexWebsocketClient {
                     collection.insertOne(doc)
                 }
             }
-        } else {
+        }
+        else {
             throw MarketDataServerException("The message type has no associated deserializer. Message=$message")
         }
     }
