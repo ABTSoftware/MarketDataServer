@@ -33,7 +33,7 @@ class MarketDataServer : IMarketDataServer {
             Log.info("server status ==> " + Calendar.getInstance().getTime());
             try {
                 synchronized(syncObj) {
-                    syncObj.wait(2000)
+                    syncObj.wait(10000)
                 }
             } catch (e: InterruptedException) {
 

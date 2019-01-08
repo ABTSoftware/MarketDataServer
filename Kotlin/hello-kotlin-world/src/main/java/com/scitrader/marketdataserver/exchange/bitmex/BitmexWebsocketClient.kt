@@ -14,6 +14,7 @@ import com.scitrader.marketdataserver.transport.AutoReconnectWebsocket
 import org.apache.logging.log4j.LogManager
 import org.bson.Document
 import java.net.URI
+import java.util.concurrent.atomic.AtomicLong
 
 class BitmexWebsocketClient : IBitmexWebsocketClient {
 
@@ -23,6 +24,7 @@ class BitmexWebsocketClient : IBitmexWebsocketClient {
     }
 
     private var mongoDatabase: MongoDatabase
+    private var messageCount : AtomicLong = AtomicLong(0)
 
     @Inject
     constructor(mongoDbService: IMongoDbService) {
@@ -52,7 +54,12 @@ class BitmexWebsocketClient : IBitmexWebsocketClient {
                 Log.info("Ignoring partial trade message: $message")
             } else if (message.contains("insert")) {
                 val ticks = JsonIterator.deserialize(message, TicksMessage::class.java)
-                Log.info("Received data: " + ticks.data)
+
+                val mc : Long = messageCount.addAndGet(1)
+                if (mc % 100 == 0L){
+                    Log.info("($mc th Message) Received data: " + ticks.data)
+                }
+
                 for (t in ticks.data) {
                     val collection = getMongoCollection(t)
                     val doc = t.toBsonDocument()
