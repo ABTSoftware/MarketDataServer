@@ -3,28 +3,24 @@ package com.scitrader.marketdataserver.common.Model
 import com.jsoniter.annotation.JsonCreator
 import com.jsoniter.annotation.JsonProperty
 import org.joda.time.DateTime
+import org.json.JSONObject
 
-class PriceBar () {
+data class PriceBar (var time: DateTime,
+                     var open : Double,
+                     var high : Double,
+                     var low : Double,
+                     var close : Double,
+                     var volume : Double) {
 
-    var time : DateTime = DateTime(0)
-    var open : Double = 0.0
-    var high : Double = 0.0
-    var low : Double = 0.0
-    var close : Double = 0.0
-    var volume : Double = 0.0
-
-    @JsonCreator
-    constructor(@JsonProperty("time") time: DateTime,
-                @JsonProperty("open") open : Double,
-                @JsonProperty("high") high : Double,
-                @JsonProperty("low") low : Double,
-                @JsonProperty("close") close : Double,
-                @JsonProperty("volume") volume : Double) : this(){
-        this.time = time
-        this.open = open
-        this.high = high
-        this.low = low
-        this.close = close
-        this.volume = volume
+    fun toJson(): String {
+        val jsonString = JSONObject()
+                .put("time", time.millis)
+                .put("open", open)
+                .put("high", high)
+                .put("low", low)
+                .put("close", close)
+                .put("volume", volume)
+                .toString()
+        return jsonString
     }
 }

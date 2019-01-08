@@ -2,10 +2,14 @@ package com.scitrader.marketdataserver
 
 import com.google.inject.Inject
 import com.jsoniter.output.JsonStream
+import com.mongodb.util.JSON
+import com.scitrader.marketdataserver.common.Model.PriceBar
 import com.scitrader.marketdataserver.common.Model.PriceBarType
 import com.scitrader.marketdataserver.common.utility.DateUtil
 import com.scitrader.marketdataserver.datastore.ITickAggregatorService
 import org.apache.logging.log4j.LogManager
+import org.json.JSONArray
+import org.json.JSONObject
 import spark.Request
 import spark.Response
 import spark.Spark.exception
@@ -32,7 +36,7 @@ class MarketDataController @Inject constructor(val tickAggregator : ITickAggrega
         res.body(e.toString())
     }
 
-    private fun onMarketData(request: Request, response: Response): Any {
+    private fun onMarketData(request: Request, response: Response): String {
         val exchangeCode = request.params("exchange")
         val marketidentifiercode = request.params("symbol")
         val startDate = request.params("start")
@@ -61,10 +65,14 @@ class MarketDataController @Inject constructor(val tickAggregator : ITickAggrega
                 arg)
 
         response.status(StatusOk)
-        return JsonStream.serialize(priceBars)
+        val json = JSONArray()
+        for(priceBar in priceBars){
+            json.put(priceBar.toJson())
+        }
+        return json.toString()
     }
 
-    private fun onHello(request: Request, response: Response): Any {
+    private fun onHello(request: Request, response: Response): String {
         Log.info("Received hello request from " + request.ip())
         response.status(StatusOk)
         return "Affirmative Dave, the Coat-lin com.scitrader.marketdataserver is online"
