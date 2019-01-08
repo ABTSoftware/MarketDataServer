@@ -2,7 +2,9 @@ package com.scitrader.marketdataserver
 
 import com.google.inject.AbstractModule
 import com.scitrader.marketdataserver.datastore.IMongoDbService
+import com.scitrader.marketdataserver.datastore.ITickAggregatorService
 import com.scitrader.marketdataserver.datastore.MongoDbService
+import com.scitrader.marketdataserver.datastore.TickAggregatorService
 import com.scitrader.marketdataserver.exchange.bitmex.BitmexWebsocketClient
 import com.scitrader.marketdataserver.exchange.bitmex.IBitmexWebsocketClient
 
@@ -15,5 +17,6 @@ class MarketDataServerModule : AbstractModule() {
         bind(IMarketDataController::class.java).to(MarketDataController::class.java).asEagerSingleton()
         bind(IBitmexWebsocketClient::class.java).to(BitmexWebsocketClient::class.java).asEagerSingleton()
         bind(IMongoDbService::class.java).to(MongoDbService::class.java).asEagerSingleton()
+        bind(ITickAggregatorService::class.java).to(TickAggregatorService::class.java).asEagerSingleton()
     }
 }
