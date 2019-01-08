@@ -8,6 +8,8 @@ import com.scitrader.marketdataserver.common.MarketDataServerException
 import com.scitrader.marketdataserver.datastore.IMongoDbService
 import com.scitrader.marketdataserver.exchange.bitmex.messages.*
 import com.scitrader.marketdataserver.transport.AutoReconnectWebsocket
+import com.scitrader.marketdataserver.transport.IAutoReconnectWebsocket
+import com.scitrader.marketdataserver.transport.IAutoReconnectWebsocketFactory
 import org.apache.logging.log4j.LogManager
 import org.bson.Document
 import java.net.URI
@@ -22,11 +24,17 @@ class BitmexWebsocketClient : IBitmexWebsocketClient {
 
     private var mongoDatabase: MongoDatabase
     private var messageCount : AtomicLong = AtomicLong(0)
+    private var messageHandler: IBitmexMessageHandler
+    private var socketFactory: IAutoReconnectWebsocketFactory
 
     @Inject
-    constructor(mongoDbService: IMongoDbService) {
+    constructor(mongoDbService: IMongoDbService,
+                messageHandler : IBitmexMessageHandler,
+                socketFactory : IAutoReconnectWebsocketFactory) {
 
         this.mongoDatabase = mongoDbService.tickDatabase
+        this.messageHandler = messageHandler
+        this.socketFactory = socketFactory
     }
 
     override fun connect() {
@@ -34,7 +42,7 @@ class BitmexWebsocketClient : IBitmexWebsocketClient {
         val uri = getUri()
         Log.info("Initializing AutoReconnectWebsocket with Uri = " + uri.toString())
 
-        val ws = AutoReconnectWebsocket(uri, { m -> onMessage(m)})
+        val ws = socketFactory.new(uri, { m -> onMessage(m)})
         ws.connect()
     }
 
